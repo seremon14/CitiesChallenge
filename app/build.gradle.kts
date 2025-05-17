@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.android.maps.compose)
+    implementation(libs.android.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
