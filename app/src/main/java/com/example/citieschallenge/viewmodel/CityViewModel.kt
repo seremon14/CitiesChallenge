@@ -17,6 +17,9 @@ class CityViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Mapa para búsqueda rápida por ID
+    private var cityMapById: Map<Long, City> = emptyMap()
+
     init {
         loadCities()
     }
@@ -28,9 +31,16 @@ class CityViewModel(application: Application) : AndroidViewModel(application) {
                 val result = CityRepository.loadCitiesFromAssets(getApplication())
                     .sortedBy { it.name.lowercase() } // orden alfabético por nombre
                 _cities.value = result
+                // Construir el mapa para acceso rápido por id
+                cityMapById = result.associateBy { it.id }
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+    // Obtener ciudad por ID usando el mapa para acceso O(1)
+    fun getCityById(id: Long): City? {
+        return cityMapById[id]
     }
 }
