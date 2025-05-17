@@ -1,0 +1,14 @@
+package com.example.citieschallenge.model
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class City(
+    @SerialName("_id")
+    val id: Long,
+    val name: String,
+    val country: String,
+    @SerialName("coord")
+    val coordinate: Coordinate
+)
