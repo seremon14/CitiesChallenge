@@ -47,7 +47,7 @@ fun CityListScreen(
                     },
                     trailingContent = {
                         IconButton(onClick = {
-                            navController.navigate(Screen.Map.createRoute(city.coordinate.lat, city.coordinate.lon))
+                            navController.navigate(Screen.Map.createRoute(city.name, city.coordinate.lat, city.coordinate.lon))
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Place,

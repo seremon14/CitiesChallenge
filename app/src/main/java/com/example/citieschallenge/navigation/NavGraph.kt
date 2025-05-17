@@ -13,8 +13,8 @@ import com.example.citieschallenge.ui.MapScreen
 sealed class Screen(val route: String) {
     object CityList : Screen("city_list")
 
-    object Map : Screen("map/{lat}/{lon}") {
-        fun createRoute(lat: Float, lon: Float) = "map/$lat/$lon"
+    object Map : Screen("map/{cityName}/{lat}/{lon}") {
+        fun createRoute(cityName: String, lat: Float, lon: Float) = "map/$cityName/$lat/$lon"
     }
 
     object Detail : Screen("detail/{cityId}") {
@@ -33,13 +33,15 @@ fun NavGraph(navController: NavHostController) {
         composable(
             route = Screen.Map.route,
             arguments = listOf(
+                navArgument("cityName") { type = NavType.StringType },
                 navArgument("lat") { type = NavType.FloatType },
                 navArgument("lon") { type = NavType.FloatType }
             )
         ) { backStackEntry ->
+            val cityName = backStackEntry.arguments?.getString("cityName") ?: ""
             val lat = backStackEntry.arguments?.getFloat("lat") ?: 0f
             val lon = backStackEntry.arguments?.getFloat("lon") ?: 0f
-            MapScreen(navController = navController, lat = lat, lon = lon)
+            MapScreen(navController = navController, cityName = cityName, lat = lat, lon = lon)
         }
 
         composable(
