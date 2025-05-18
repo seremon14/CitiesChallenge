@@ -10,5 +10,6 @@ data class City(
     val name: String,
     val country: String,
     @SerialName("coord")
-    val coordinate: Coordinate
+    val coordinate: Coordinate,
+    val isFavorite: Boolean = false
 )
