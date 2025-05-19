@@ -1,7 +1,5 @@
 package com.example.citieschallenge.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.citieschallenge.data.local.FavoritesDataStore
@@ -10,11 +8,8 @@ import com.example.citieschallenge.domain.model.City
 import com.example.citieschallenge.ui.screens.CityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,8 +22,6 @@ class CityViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(CityUiState())
     val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
-
-    private var cityMapById: Map<Long, City> = emptyMap()
 
     init {
         loadCities()
@@ -58,9 +51,6 @@ class CityViewModel @Inject constructor(
             }
         }
     }
-
-
-    fun getCityById(id: Long): City? = cityMapById[id]
 
     fun updateSearchQuery(query: String) {
         _uiState.update {

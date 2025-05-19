@@ -18,7 +18,6 @@ fun FavoriteIcon(
     isFavorite: Boolean,
     onToggle: () -> Unit
 ) {
-    val gold = Color(0xFFFFC107)
 
     val scale by animateFloatAsState(
         targetValue = if (isFavorite) 1.3f else 1f,
