@@ -6,19 +6,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.citieschallenge.ui.CityDetailScreen
-import com.example.citieschallenge.ui.CityListScreen
-import com.example.citieschallenge.ui.MapScreen
+import com.example.citieschallenge.ui.screens.CityListScreen
+import com.example.citieschallenge.ui.screens.MapScreen
 
 sealed class Screen(val route: String) {
     object CityList : Screen("city_list")
 
     object Map : Screen("map/{cityName}/{lat}/{lon}") {
         fun createRoute(cityName: String, lat: Float, lon: Float) = "map/$cityName/$lat/$lon"
-    }
-
-    object Detail : Screen("detail/{cityId}") {
-        fun createRoute(cityId: Long) = "detail/$cityId"
     }
 }
 
@@ -42,16 +37,6 @@ fun NavGraph(navController: NavHostController) {
             val lat = backStackEntry.arguments?.getFloat("lat") ?: 0f
             val lon = backStackEntry.arguments?.getFloat("lon") ?: 0f
             MapScreen(navController = navController, cityName = cityName, lat = lat, lon = lon)
-        }
-
-        composable(
-            route = Screen.Detail.route,
-            arguments = listOf(
-                navArgument("cityId") { type = NavType.LongType }
-            )
-        ) { backStackEntry ->
-            val cityId = backStackEntry.arguments?.getLong("cityId") ?: -1
-            CityDetailScreen(navController = navController, cityId = cityId)
         }
     }
 }

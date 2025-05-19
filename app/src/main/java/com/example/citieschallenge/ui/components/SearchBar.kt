@@ -18,6 +18,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         value = query,
         onValueChange = onQueryChange,
         label = { Text("Buscar ciudad") },
+        singleLine = true,
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {
@@ -27,6 +28,6 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }

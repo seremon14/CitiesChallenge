@@ -1,4 +1,4 @@
-package com.example.citieschallenge.model
+package com.example.citieschallenge.domain.model
 
 import kotlinx.serialization.Serializable
 
