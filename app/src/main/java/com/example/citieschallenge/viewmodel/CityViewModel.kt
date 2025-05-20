@@ -23,31 +23,40 @@ class CityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CityUiState())
     val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
 
+    private val _visibleCities = MutableStateFlow<List<City>>(emptyList())
+    val visibleCities: StateFlow<List<City>> = _visibleCities.asStateFlow()
+
+    private val _filteredCities = MutableStateFlow<List<City>>(emptyList())
+    val filteredCities: StateFlow<List<City>> = _filteredCities.asStateFlow()
+
+    private var citiesLoaded = false
+
+
     init {
         loadCities()
 
         viewModelScope.launch {
             favoritesDataStore.favoritesFlow.collect { favorites ->
                 _uiState.update { it.copy(favoriteCityIds = favorites) }
+                updateFilteredCities()
             }
         }
     }
 
     private fun loadCities() {
+        if (citiesLoaded) return
+
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
 
                 val result = repository.loadCities()
-                    .sortedBy { it.name.lowercase() }
 
-                _uiState.update {
-                    it.copy(cities = result)
-                }
+                _uiState.update { it.copy(cities = result) }
+                citiesLoaded = true
+                updateFilteredCities()
             } finally {
-                _uiState.update {
-                    it.copy(isLoading = false)
-                }
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -56,10 +65,19 @@ class CityViewModel @Inject constructor(
         _uiState.update {
             it.copy(searchQuery = query, visibleCount = 50)
         }
+        updateFilteredCities()
+    }
+
+    fun toggleShowOnlyFavorites() {
+        _uiState.update {
+            it.copy(showOnlyFavorites = !it.showOnlyFavorites)
+        }
+        updateFilteredCities()
     }
 
     fun loadMore() {
         _uiState.update { it.copy(visibleCount = it.visibleCount + 50) }
+        updateFilteredCities()
     }
 
     fun selectCity(city: City) {
@@ -77,7 +95,22 @@ class CityViewModel @Inject constructor(
         }
     }
 
-    fun toggleShowOnlyFavorites() {
-        _uiState.update { it.copy(showOnlyFavorites = !it.showOnlyFavorites) }
+    private fun updateFilteredCities() {
+        val state = _uiState.value
+
+        var result = if (state.searchQuery.isBlank()) {
+            state.cities
+        } else {
+            state.cities.filter {
+                it.name.startsWith(state.searchQuery, ignoreCase = true)
+            }
+        }
+
+        if (state.showOnlyFavorites) {
+            result = result.filter { it.id in state.favoriteCityIds }
+        }
+
+        _filteredCities.value = result
+        _visibleCities.value = result.take(state.visibleCount)
     }
 }

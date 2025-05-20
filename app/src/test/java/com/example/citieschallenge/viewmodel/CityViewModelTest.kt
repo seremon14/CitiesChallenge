@@ -158,8 +158,8 @@ class CityViewModelTest {
     fun `loadCities updates uiState with cities and handles loading state`() = runTest {
         // Given
         val cities = listOf(
-            City(id = 1L, name = "Medellín", country = "Colombia", coordinate = Coordinate(lat = 0.0f, lon = 0.0f)),
-            City(id = 2L, name = "Bogotá", country = "Colombia", coordinate = Coordinate(lat = 0.0f, lon = 0.0f))
+            City(id = 1L, name = "Bogotá", country = "Colombia", coordinate = Coordinate(lat = 0.0f, lon = 0.0f)),
+            City(id = 2L, name = "Medellín", country = "Colombia", coordinate = Coordinate(lat = 0.0f, lon = 0.0f))
         )
         every { favoritesDataStore.favoritesFlow } returns MutableStateFlow(emptySet())
         coEvery { repository.loadCities() } returns cities

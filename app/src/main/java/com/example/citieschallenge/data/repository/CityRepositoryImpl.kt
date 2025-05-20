@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.sortedBy
 
 @Singleton
 class CityRepositoryImpl @Inject constructor(
@@ -23,7 +24,11 @@ class CityRepositoryImpl @Inject constructor(
             .bufferedReader()
             .use { it.readText() }
 
-        cityList = Json.decodeFromString(json)
+        cityList = parseCities(json).sortedBy { it.name.lowercase() }
         return@withContext cityList!!
+    }
+
+    private fun parseCities(json: String): List<City> {
+        return Json.decodeFromString(json)
     }
 }
