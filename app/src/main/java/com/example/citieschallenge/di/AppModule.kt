@@ -6,7 +6,6 @@ import com.example.citieschallenge.data.repository.CityRepository
 import com.example.citieschallenge.data.repository.CityRepositoryImpl
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -26,5 +25,4 @@ abstract class AppModule {
     abstract fun bindFavoritesDataStore(
         impl: FavoritesDataStoreImpl
     ): FavoritesDataStore
-
 }

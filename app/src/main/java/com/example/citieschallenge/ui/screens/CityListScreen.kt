@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.citieschallenge.navigation.Screen
@@ -27,13 +28,13 @@ import com.example.citieschallenge.ui.components.CityList
 import com.example.citieschallenge.ui.components.CityListTopBar
 import com.example.citieschallenge.ui.components.EmbeddedMap
 import com.example.citieschallenge.ui.components.SearchBar
-import com.example.citieschallenge.viewmodel.CityViewModel
+import com.example.citieschallenge.viewmodel.ICityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CityListScreen(
     navController: NavController,
-    viewModel: CityViewModel
+    viewModel: ICityViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -58,7 +59,7 @@ fun CityListScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
             }
         } else {
             if (isLandscape) {

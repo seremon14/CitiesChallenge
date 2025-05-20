@@ -1,5 +1,6 @@
 package com.example.citieschallenge.viewmodel
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.citieschallenge.data.local.FavoritesDataStore
@@ -18,16 +19,16 @@ import javax.inject.Inject
 class CityViewModel @Inject constructor(
     private val repository: CityRepository,
     private val favoritesDataStore: FavoritesDataStore
-) : ViewModel() {
+) : ViewModel(), ICityViewModel {
 
     private val _uiState = MutableStateFlow(CityUiState())
-    val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
+    override val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
 
     private val _visibleCities = MutableStateFlow<List<City>>(emptyList())
-    val visibleCities: StateFlow<List<City>> = _visibleCities.asStateFlow()
+    override val visibleCities: StateFlow<List<City>> = _visibleCities.asStateFlow()
 
     private val _filteredCities = MutableStateFlow<List<City>>(emptyList())
-    val filteredCities: StateFlow<List<City>> = _filteredCities.asStateFlow()
+    override val filteredCities: StateFlow<List<City>> = _filteredCities.asStateFlow()
 
     private var citiesLoaded = false
 
@@ -43,7 +44,8 @@ class CityViewModel @Inject constructor(
         }
     }
 
-    private fun loadCities() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun loadCities() {
         if (citiesLoaded) return
 
         viewModelScope.launch {
@@ -61,30 +63,30 @@ class CityViewModel @Inject constructor(
         }
     }
 
-    fun updateSearchQuery(query: String) {
+    override fun updateSearchQuery(query: String) {
         _uiState.update {
             it.copy(searchQuery = query, visibleCount = 50)
         }
         updateFilteredCities()
     }
 
-    fun toggleShowOnlyFavorites() {
+    override fun toggleShowOnlyFavorites() {
         _uiState.update {
             it.copy(showOnlyFavorites = !it.showOnlyFavorites)
         }
         updateFilteredCities()
     }
 
-    fun loadMore() {
+    override fun loadMore() {
         _uiState.update { it.copy(visibleCount = it.visibleCount + 50) }
         updateFilteredCities()
     }
 
-    fun selectCity(city: City) {
+    override fun selectCity(city: City) {
         _uiState.update { it.copy(selectedCity = city) }
     }
 
-    fun toggleFavorite(cityId: Long) {
+    override fun toggleFavorite(cityId: Long) {
         viewModelScope.launch {
             val isFavorite = cityId in uiState.value.favoriteCityIds
             if (isFavorite) {

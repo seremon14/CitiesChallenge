@@ -74,6 +74,30 @@ class CityViewModelTest {
     }
 
     @Test
+    fun `updateSearchQuery with partial text matches multiple cities`() = runTest {
+        // Given
+        val cities = listOf(
+            City(id = 1L, name = "Medellín", country = "CO", coordinate = Coordinate(0f, 0f)),
+            City(id = 2L, name = "Melbourne", country = "AU", coordinate = Coordinate(0f, 0f)),
+            City(id = 3L, name = "Bogotá", country = "CO", coordinate = Coordinate(0f, 0f))
+        )
+        coEvery { repository.loadCities() } returns cities
+        every { favoritesDataStore.favoritesFlow } returns MutableStateFlow(emptySet())
+
+        viewModel = CityViewModel(repository, favoritesDataStore)
+        advanceUntilIdle()
+
+        // When
+        viewModel.updateSearchQuery("me")
+
+        // Then
+        val resultNames = viewModel.filteredCities.value.map { it.name }
+
+        assertEquals(listOf("Medellín", "Melbourne"), resultNames)
+    }
+
+
+    @Test
     fun `loadMore increases visibleCount by 50`() = runTest {
         // Given
         val initial = viewModel.uiState.value.visibleCount
@@ -152,8 +176,6 @@ class CityViewModelTest {
         coVerify { favoritesDataStore.removeFavorite(cityId) }
     }
 
-
-
     @Test
     fun `loadCities updates uiState with cities and handles loading state`() = runTest {
         // Given
@@ -170,5 +192,47 @@ class CityViewModelTest {
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
         assertEquals(cities.sortedBy { it.name.lowercase() }, state.cities)
+    }
+
+    @Test
+    fun `updateSearchQuery with no match results in empty filteredCities`() = runTest {
+        // Given
+        val query = "NoExiste"
+
+        // When
+        viewModel.updateSearchQuery(query)
+
+        // Then
+        val state = viewModel.uiState.value
+        assertEquals(query, state.searchQuery)
+        assertEquals(0, viewModel.filteredCities.value.size)
+    }
+
+    @Test
+    fun `loadCities is only called once`() = runTest {
+        // When
+        viewModel.loadCities()
+        viewModel.loadCities() // llamada extra que no debería tener efecto
+
+        // Then
+        coVerify(exactly = 1) { repository.loadCities() }
+    }
+
+    @Test
+    fun `filteredCities contains only favorites when filter is active`() = runTest {
+        // Given
+        val cityId = 1L
+        val favoritesFlow = MutableStateFlow(setOf(cityId))
+        every { favoritesDataStore.favoritesFlow } returns favoritesFlow
+
+        viewModel = CityViewModel(repository, favoritesDataStore)
+        advanceUntilIdle()
+
+        // When
+        viewModel.toggleShowOnlyFavorites()
+
+        // Then
+        assertEquals(1, viewModel.filteredCities.value.size)
+        assertEquals(cityId, viewModel.filteredCities.value.first().id)
     }
 }

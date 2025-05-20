@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.citieschallenge.ui.components.CityDetailDialog
 import com.example.citieschallenge.ui.components.EmbeddedMap
-import com.example.citieschallenge.viewmodel.CityViewModel
+import com.example.citieschallenge.viewmodel.ICityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +35,7 @@ fun MapScreen(
     cityName: String,
     lat: Float,
     lon: Float,
-    viewModel: CityViewModel
+    viewModel: ICityViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val city = uiState.selectedCity ?: return
