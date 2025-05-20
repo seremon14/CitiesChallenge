@@ -1,117 +1,118 @@
 package com.example.citieschallenge.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.citieschallenge.data.FavoritesDataStore
-import com.example.citieschallenge.model.City
-import com.example.citieschallenge.repository.CityRepository
+import com.example.citieschallenge.data.local.FavoritesDataStore
+import com.example.citieschallenge.data.repository.CityRepository
+import com.example.citieschallenge.domain.model.City
+import com.example.citieschallenge.ui.screens.CityUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CityViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class CityViewModel @Inject constructor(
+    private val repository: CityRepository,
+    private val favoritesDataStore: FavoritesDataStore
+) : ViewModel(), ICityViewModel {
 
-    private val _cities = MutableStateFlow<List<City>>(emptyList())
-    val cities: StateFlow<List<City>> = _cities
+    private val _uiState = MutableStateFlow(CityUiState())
+    override val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    private val _visibleCities = MutableStateFlow<List<City>>(emptyList())
+    override val visibleCities: StateFlow<List<City>> = _visibleCities.asStateFlow()
 
-    private var cityMapById: Map<Long, City> = emptyMap()
+    private val _filteredCities = MutableStateFlow<List<City>>(emptyList())
+    override val filteredCities: StateFlow<List<City>> = _filteredCities.asStateFlow()
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery
+    private var citiesLoaded = false
 
-    private val _visibleCount = MutableStateFlow(50)
-    val visibleCount: StateFlow<Int> = _visibleCount
-
-    private val _selectedCity = MutableStateFlow<City?>(null)
-    val selectedCity: StateFlow<City?> = _selectedCity
-
-    private val _favoriteCityIds = MutableStateFlow<Set<Long>>(emptySet())
-    val favoriteCityIds: StateFlow<Set<Long>> = _favoriteCityIds
-
-    private val _showOnlyFavorites = MutableStateFlow(false)
-    val showOnlyFavorites: StateFlow<Boolean> = _showOnlyFavorites
 
     init {
         loadCities()
 
         viewModelScope.launch {
-            FavoritesDataStore.getFavorites(getApplication()).collect { favorites ->
-                _favoriteCityIds.value = favorites
+            favoritesDataStore.favoritesFlow.collect { favorites ->
+                _uiState.update { it.copy(favoriteCityIds = favorites) }
+                updateFilteredCities()
             }
         }
     }
 
-    private fun loadCities() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun loadCities() {
+        if (citiesLoaded) return
+
         viewModelScope.launch {
             try {
-                _isLoading.value = true
-                val result = CityRepository.loadCitiesFromAssets(getApplication())
-                    .sortedBy { it.name.lowercase() }
-                _cities.value = result
-                cityMapById = result.associateBy { it.id }
+                _uiState.update { it.copy(isLoading = true) }
+
+                val result = repository.loadCities()
+
+                _uiState.update { it.copy(cities = result) }
+                citiesLoaded = true
+                updateFilteredCities()
             } finally {
-                _isLoading.value = false
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    fun getCityById(id: Long): City? {
-        return cityMapById[id]
+    override fun updateSearchQuery(query: String) {
+        _uiState.update {
+            it.copy(searchQuery = query, visibleCount = 50)
+        }
+        updateFilteredCities()
     }
 
-    fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-        _visibleCount.value = 50
+    override fun toggleShowOnlyFavorites() {
+        _uiState.update {
+            it.copy(showOnlyFavorites = !it.showOnlyFavorites)
+        }
+        updateFilteredCities()
     }
 
-    fun loadMore() {
-        _visibleCount.update { it + 50 }
+    override fun loadMore() {
+        _uiState.update { it.copy(visibleCount = it.visibleCount + 50) }
+        updateFilteredCities()
     }
 
-    fun selectCity(city: City) {
-        _selectedCity.value = city
+    override fun selectCity(city: City) {
+        _uiState.update { it.copy(selectedCity = city) }
     }
 
-    fun toggleFavorite(cityId: Long) {
+    override fun toggleFavorite(cityId: Long) {
         viewModelScope.launch {
-            val context = getApplication<Application>().applicationContext
-            if (cityId in _favoriteCityIds.value) {
-                FavoritesDataStore.removeFavorite(context, cityId)
+            val isFavorite = cityId in uiState.value.favoriteCityIds
+            if (isFavorite) {
+                favoritesDataStore.removeFavorite(cityId)
             } else {
-                FavoritesDataStore.saveFavorite(context, cityId)
+                favoritesDataStore.saveFavorite(cityId)
             }
         }
     }
 
-    fun toggleShowOnlyFavorites() {
-        _showOnlyFavorites.value = !_showOnlyFavorites.value
-    }
+    private fun updateFilteredCities() {
+        val state = _uiState.value
 
-    val filteredCities: StateFlow<List<City>> = combine(
-        _searchQuery, _cities, _favoriteCityIds, _showOnlyFavorites
-    ) { query, allCities, favorites, showOnlyFavs ->
-
-        var result = if (query.isBlank()) {
-            allCities
+        var result = if (state.searchQuery.isBlank()) {
+            state.cities
         } else {
-            allCities.filter {
-                it.name.startsWith(query, ignoreCase = true)
+            state.cities.filter {
+                it.name.startsWith(state.searchQuery, ignoreCase = true)
             }
         }
 
-        if (showOnlyFavs) {
-            result = result.filter { it.id in favorites }
+        if (state.showOnlyFavorites) {
+            result = result.filter { it.id in state.favoriteCityIds }
         }
 
-        result
-
-    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        _filteredCities.value = result
+        _visibleCities.value = result.take(state.visibleCount)
+    }
 }

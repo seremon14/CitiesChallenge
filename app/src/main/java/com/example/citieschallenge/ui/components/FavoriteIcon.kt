@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,7 +18,6 @@ fun FavoriteIcon(
     isFavorite: Boolean,
     onToggle: () -> Unit
 ) {
-    val gold = Color(0xFFFFC107)
 
     val scale by animateFloatAsState(
         targetValue = if (isFavorite) 1.3f else 1f,
@@ -28,7 +28,7 @@ fun FavoriteIcon(
         Icon(
             imageVector = Icons.TwoTone.Star,
             contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-            tint = if (isFavorite) gold else Color.LightGray,
+            tint = if (isFavorite) MaterialTheme.colorScheme.tertiary else Color.LightGray,
             modifier = Modifier.scale(scale)
         )
     }

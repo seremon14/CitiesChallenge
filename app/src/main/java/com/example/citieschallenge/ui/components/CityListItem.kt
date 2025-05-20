@@ -2,15 +2,18 @@ package com.example.citieschallenge.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.citieschallenge.model.City
+import androidx.compose.ui.unit.dp
+import com.example.citieschallenge.domain.model.City
 
 @Composable
 fun CityListItem(
@@ -18,30 +21,30 @@ fun CityListItem(
     isFavorite: Boolean,
     onClick: () -> Unit,
     onFavoriteToggle: () -> Unit,
-    onMapClick: (() -> Unit)? = null
 ) {
     ListItem(
-        headlineContent = { Text("${city.name}, ${city.country}") },
+        headlineContent = {
+            Text(
+                text = "${city.name}, ${city.country}",
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
         supportingContent = {
-            Text("Lat: ${city.coordinate.lat}, Lon: ${city.coordinate.lon}")
+            Text(
+                text = "Lat: ${city.coordinate.lat}, Lon: ${city.coordinate.lon}",
+                style = MaterialTheme.typography.bodySmall
+            )
         },
         trailingContent = {
-            Row {
-                FavoriteIcon(
-                    isFavorite = isFavorite,
-                    onToggle = onFavoriteToggle
-                )
-                onMapClick?.let {
-                    IconButton(onClick = it) {
-                        Icon(
-                            imageVector = Icons.Default.Place,
-                            contentDescription = "Ver en mapa"
-                        )
-                    }
-                }
-            }
+            FavoriteIcon(
+                isFavorite = isFavorite,
+                onToggle = onFavoriteToggle
+            )
         },
-        modifier = Modifier.clickable(onClick = onClick)
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     )
 }
+
 

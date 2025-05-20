@@ -19,7 +19,7 @@ fun EmbeddedMap(cityName: String, lat: Float, lon: Float) {
         cameraPositionState.animate(
             update = CameraUpdateFactory.newLatLngZoom(
                 LatLng(lat.toDouble(), lon.toDouble()),
-                12f
+                14f
             ),
             durationMs = 1000
         )
