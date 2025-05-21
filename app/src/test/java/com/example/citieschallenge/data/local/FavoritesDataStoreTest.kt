@@ -10,10 +10,10 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 
-class FavoritesDataStoreImplSimpleTest {
+class FavoritesDataStoreTest {
 
     private lateinit var dataStore: androidx.datastore.core.DataStore<Preferences>
-    private lateinit var favoritesDataStore: FavoritesDataStoreImpl
+    private lateinit var favoritesDataStore: FavoritesDataStore
 
     @Before
     fun setup() {
@@ -21,7 +21,7 @@ class FavoritesDataStoreImplSimpleTest {
         dataStore = PreferenceDataStoreFactory.create(
             produceFile = { file }
         )
-        favoritesDataStore = FavoritesDataStoreImpl(dataStore)
+        favoritesDataStore = FavoritesDataStore(dataStore)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

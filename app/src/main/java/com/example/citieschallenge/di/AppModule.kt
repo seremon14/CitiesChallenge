@@ -1,9 +1,9 @@
 package com.example.citieschallenge.di
 
+import com.example.citieschallenge.data.local.IFavoritesDataStore
 import com.example.citieschallenge.data.local.FavoritesDataStore
-import com.example.citieschallenge.data.local.FavoritesDataStoreImpl
+import com.example.citieschallenge.data.repository.ICityRepository
 import com.example.citieschallenge.data.repository.CityRepository
-import com.example.citieschallenge.data.repository.CityRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,12 +17,12 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindCityRepository(
-        impl: CityRepositoryImpl
-    ): CityRepository
+        impl: CityRepository
+    ): ICityRepository
 
     @Binds
     @Singleton
     abstract fun bindFavoritesDataStore(
-        impl: FavoritesDataStoreImpl
-    ): FavoritesDataStore
+        impl: FavoritesDataStore
+    ): IFavoritesDataStore
 }
