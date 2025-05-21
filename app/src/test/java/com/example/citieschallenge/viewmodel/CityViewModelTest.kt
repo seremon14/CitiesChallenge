@@ -1,6 +1,6 @@
 package com.example.citieschallenge.viewmodel
 
-import com.example.citieschallenge.data.local.FavoritesDataStore
+import com.example.citieschallenge.data.local.IFavoritesDataStore
 import com.example.citieschallenge.data.repository.CityRepository
 import com.example.citieschallenge.domain.model.City
 import com.example.citieschallenge.domain.model.Coordinate
@@ -35,7 +35,7 @@ class CityViewModelTest {
     private lateinit var repository: CityRepository
 
     @MockK
-    private lateinit var favoritesDataStore: FavoritesDataStore
+    private lateinit var favoritesDataStore: IFavoritesDataStore
 
     @Before
     fun setup() {

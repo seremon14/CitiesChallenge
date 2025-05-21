@@ -3,7 +3,7 @@ package com.example.citieschallenge.viewmodel
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.citieschallenge.data.local.FavoritesDataStore
+import com.example.citieschallenge.data.local.IFavoritesDataStore
 import com.example.citieschallenge.data.repository.CityRepository
 import com.example.citieschallenge.domain.model.City
 import com.example.citieschallenge.ui.screens.CityUiState
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CityViewModel @Inject constructor(
     private val repository: CityRepository,
-    private val favoritesDataStore: FavoritesDataStore
+    private val favoritesDataStore: IFavoritesDataStore
 ) : ViewModel(), ICityViewModel {
 
     private val _uiState = MutableStateFlow(CityUiState())
