@@ -1,7 +1,7 @@
 package com.example.citieschallenge.viewmodel
 
 import com.example.citieschallenge.data.local.IFavoritesDataStore
-import com.example.citieschallenge.data.repository.CityRepository
+import com.example.citieschallenge.data.repository.ICityRepository
 import com.example.citieschallenge.domain.model.City
 import com.example.citieschallenge.domain.model.Coordinate
 import io.mockk.MockKAnnotations
@@ -32,7 +32,7 @@ class CityViewModelTest {
     private lateinit var viewModel: CityViewModel
 
     @MockK
-    private lateinit var repository: CityRepository
+    private lateinit var repository: ICityRepository
 
     @MockK
     private lateinit var favoritesDataStore: IFavoritesDataStore

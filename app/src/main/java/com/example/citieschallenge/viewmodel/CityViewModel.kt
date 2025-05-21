@@ -4,7 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.citieschallenge.data.local.IFavoritesDataStore
-import com.example.citieschallenge.data.repository.CityRepository
+import com.example.citieschallenge.data.repository.ICityRepository
 import com.example.citieschallenge.domain.model.City
 import com.example.citieschallenge.ui.screens.CityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CityViewModel @Inject constructor(
-    private val repository: CityRepository,
+    private val repository: ICityRepository,
     private val favoritesDataStore: IFavoritesDataStore
 ) : ViewModel(), ICityViewModel {
 

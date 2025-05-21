@@ -14,9 +14,9 @@ import java.io.ByteArrayInputStream
 import kotlin.test.assertFailsWith
 
 @ExperimentalCoroutinesApi
-class CityRepositoryImplTest {
+class CityRepositoryTest {
 
-    private lateinit var repository: CityRepositoryImpl
+    private lateinit var repository: CityRepository
 
     private val mockContext = mockk<Context>(relaxed = true)
     private val mockAssets = mockk<AssetManager>(relaxed = true)
@@ -39,7 +39,7 @@ class CityRepositoryImplTest {
         val inputStream = ByteArrayInputStream(fakeJson.toByteArray())
         every { mockAssets.open("cities.json") } returns inputStream
 
-        repository = CityRepositoryImpl(mockContext)
+        repository = CityRepository(mockContext)
 
         val result = repository.loadCities()
 
@@ -55,7 +55,7 @@ class CityRepositoryImplTest {
         val inputStream = ByteArrayInputStream(invalidJson.toByteArray())
 
         every { mockAssets.open("cities.json") } returns inputStream
-        repository = CityRepositoryImpl(mockContext)
+        repository = CityRepository(mockContext)
 
         assertFailsWith<SerializationException> {
             repository.loadCities()
